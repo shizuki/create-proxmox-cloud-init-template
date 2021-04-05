@@ -1,0 +1,65 @@
+---
+
+- name: proxmox VE用cloud-initテンプレート作成
+  become: true
+  hosts: proxmox
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: terraformプロバイダ用ユーザーの存在確認
+      become: true
+      command: "pveum user list"
+      register: command_result
+
+    - name: terraformプロバイダ用ユーザーの作成
+      become: true
+      command: "pveum useradd terraform-prov@pve --password {{lookup('env', 'PM_PASS')}} -comment 'API user for Terraform'"
+      when: command_result.stdout.find('terraform-prov@pve') == -1
+
+    - name: terraformプロバイダ用ユーザーの権限設定
+      become: true
+      command: "pveum aclmod / -user terraform-prov@pve -role Administrator"
+
+    - name: テンプレートに使用するイメージファイルがダウンロード済みか確認
+      stat:
+        get_md5: false
+        get_checksum: false
+        path: "/tmp/{{cloud_init.filename}}"
+      register: imagefile
+
+    - name: テンプレートに使用するイメージファイルを取得
+      become: true
+      get_url:
+        url: "{{cloud_init.url}}{{cloud_init.filename}}"
+        dest: /tmp/
+        sha256sum: "{{cloud_init.checksum}}"
+      when: imagefile.stat.exists == False
+
+    - name: テンプレートインスタンスの元になるインスタンスを作成
+      become: true
+      command: "qm create {{template.vmid}} -name {{template.vmname}} -memory {{template.vmmemory}} -net0 virtio,bridge=vmbr0 -cores {{template.vcpucore}} -sockets {{template.vcpusockets}}"
+
+    - name: テンプレートインスタンスにイメージファイルをインポート
+      become: true
+      command: "qm importdisk {{template.vmid}} /tmp/{{cloud_init.filename}} {{storage}} --format {{template.vmdiskformat}}"
+
+    - name: インポートしたディスクをVMに接続する
+      become: true
+      command: "qm set {{template.vmid}} --scsihw virtio-scsi-pci --scsi0 {{storage}}:{{template.vmid}}/vm-{{template.vmid}}-disk-0.{{template.vmdiskext}}"
+
+    - name: Cloud-Init初期設定用ヴァーチャルCD-ROMドライブを接続
+      become: true
+      command: "qm set {{template.vmid}} --ide2 {{storage}}:cloudinit"
+
+    - name: ブートディスクを設定
+      become: true
+      command: "qm set {{template.vmid}} --boot c --bootdisk scsi0"
+
+    - name: シリアルコンソールを用意する
+      become: true
+      command: "qm set {{template.vmid}} --serial0 socket --vga serial0"
+
+    - name: テンプレート化する
+      become: true
+      command: "qm template {{template.vmid}}"

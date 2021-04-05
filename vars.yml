@@ -1,0 +1,15 @@
+---
+
+cloud_init:
+  url: http://cdimage.debian.org/cdimage/openstack/current-10/
+  filename: debian-10-openstack-amd64.qcow2
+  checksum: 7e66bc0d008e5374507bb4a23bd5c8c11c76b064c3ebe0e98af0c5ffee98c955
+template:
+  vmid: 9999
+  vmname: debian-cloudinit
+  vmmemory: 1024
+  vcpucore: 1
+  vcpusockets: 1
+  vmdiskformat: qcow2
+  vmdiskext: qcow2
+storage: disk2
