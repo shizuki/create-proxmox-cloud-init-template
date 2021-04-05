@@ -40,3 +40,11 @@ ansible 2.9.6 on ubuntu 20.04 on wslで確認
       テンプレートマシンのディスクイメージの拡張子
     - storage
       テンプレートマシンを保存するproxmoxのストレージ名
+
+### cloudinitイメージのURL
+
+  - debian
+    - http://cdimage.debian.org/cdimage/openstack/current/
+  - Ubuntu
+    - https://cloud-images.ubuntu.com/
+  - 
