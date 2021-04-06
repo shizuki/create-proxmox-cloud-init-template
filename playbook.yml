@@ -1,7 +1,6 @@
 ---
 
 - name: proxmox VE用cloud-initテンプレート作成
-  become: true
   hosts: proxmox
   vars_files:
     - vars.yml
@@ -59,6 +58,25 @@
     - name: シリアルコンソールを用意する
       become: true
       command: "qm set {{template.vmid}} --serial0 socket --vga serial0"
+
+    - name: デフォルトユーザー設定
+      become: true
+      command: "qm set {{template.vmid}} --ciuser {{template.vmuser}}"
+
+    - name: デフォルトのssh-keyペアをproxmoxホストに作成
+      openssh_keypair:
+        type: ed25519
+        path: "/tmp/{{template.vmname}}"
+
+    - name: デフォルトのauthorized_keysをテンプレートインスタンスに設定
+      become: true
+      command: "qm set {{template.vmid}} --sshkeys /tmp/{{template.vmname}}.pub"
+
+    - name: デフォルトの接続用sshキーをダウンロード
+      fetch:
+        src: "/tmp/{{template.vmname}}"
+        dest: ./
+        flat: yes
 
     - name: テンプレート化する
       become: true
