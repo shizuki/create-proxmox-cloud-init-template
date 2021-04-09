@@ -2,24 +2,24 @@
 
 cloud_init:
   # debian
-  # url: http://cdimage.debian.org/cdimage/openstack/current-10/
-  # filename: debian-10-openstack-amd64.qcow2
-  # checksum: 7e66bc0d008e5374507bb4a23bd5c8c11c76b064c3ebe0e98af0c5ffee98c955
+  url: http://cdimage.debian.org/cdimage/openstack/current-10/
+  filename: debian-10-openstack-amd64.qcow2
+  checksum: 7e66bc0d008e5374507bb4a23bd5c8c11c76b064c3ebe0e98af0c5ffee98c955
   # ubuntu
   # url: https://cloud-images.ubuntu.com/focal/current/
   # filename: focal-server-cloudimg-amd64-disk-kvm.img
   # checksum: 90038533f06be0be2440da64762067575ca75a035a5b0269e4efb991025bd5f1
   # Amazon Linux 2 (2021-04-06 10:53)
-  url: https://cdn.amazonlinux.com/os-images/2.0.20210326.0/kvm/
-  filename: amzn2-kvm-2.0.20210326.0-x86_64.xfs.gpt.qcow2
-  checksum: e42f9e153a1b6ede9b6518637ef7da8e4b95caa27a441a2c06b712040e76fd2d
+  # url: https://cdn.amazonlinux.com/os-images/2.0.20210326.0/kvm/
+  # filename: amzn2-kvm-2.0.20210326.0-x86_64.xfs.gpt.qcow2
+  # checksum: e42f9e153a1b6ede9b6518637ef7da8e4b95caa27a441a2c06b712040e76fd2d
 template:
-  vmid: 9999
-  vmname: amazon-cloudinit
-  vmmemory: 1024
+  vmid: 9998
+  vmname: buster-cloudinit
+  vmmemory: 2048
   vcpucore: 1
   vcpusockets: 1
   vmdiskformat: qcow2
   vmdiskext: qcow2
-  vmuser: ec2-user
+  vmuser: dev-user
 storage: disk2
